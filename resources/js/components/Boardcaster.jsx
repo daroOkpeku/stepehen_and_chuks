@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import MediaHandler from './MediaHandler';
 import Pusher from 'pusher-js';
 import ReactDOM from 'react-dom';
-import Peer from 'simple-peer';
+// import Peer from 'simple-peer';
 export default function Boardcaster() {
     const [videourl, setVideourl] = useState('')
     const [isvideo, setisVideo]  = useState(false)
@@ -24,6 +24,7 @@ export default function Boardcaster() {
         }).catch((error)=>{
 
         });
+
         // vidRef.current.play()
 // async function show(){
 //  let stream =  await  navigator.mediaDevices.getUserMedia({video:true, audio:true})

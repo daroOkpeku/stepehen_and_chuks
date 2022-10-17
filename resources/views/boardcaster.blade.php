@@ -7,15 +7,20 @@
     <title>Document</title>
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/components/Boardcaster.jsx'])
-
-    {{--  @vite('resources/js/app.jsx')  --}}
+    @vite('resources/js/Peer.js')
 </head>
 <body>
 
     <div id="board"></div>
 </body>
+{{--  <script src='../'></script>  --}}
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 <script>
+    {{--  var peer = new Peer();
+    console.log(peer);  --}}
     var userid =  {{ Js::from(auth()->user()->id) }}
     let token = document.querySelector('meta[name="csrf-token"]').content;
+
+
 </script>
 </html>
