@@ -20,6 +20,7 @@
 
 // }
 
+// https://github.com/progssp/laravel-chat
 export default class MediaHandler{
 
  getPermissions(){
