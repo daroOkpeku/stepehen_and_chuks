@@ -10,7 +10,7 @@ class WebrtcStreamingController extends Controller
 {
     public function makeStreamOffer(Request $request)
     {
-        dd($request->receiver->id);
+        // dd($request->all());
         $data['broadcaster'] = $request->broadcaster;
         $data['receiver'] = $request->receiver;
         $data['offer'] = $request->offer;
@@ -33,7 +33,7 @@ class WebrtcStreamingController extends Controller
 
     public function consumer(Request $request, $streamId)
     {
-        return view('video-broadcast', ['type' => 'consumer', 'streamId' => $streamId, 'id' =>auth()->user()->id]);
+        return view('viewer', ['type' => 'consumer', 'streamId' => $streamId, 'id' =>auth()->user()->id]);
     }
 
 

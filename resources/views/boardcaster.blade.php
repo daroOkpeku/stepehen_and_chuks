@@ -7,7 +7,6 @@
     <title>Document</title>
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/components/Boardcaster.jsx'])
-    @vite('resources/js/Peer.js')
 </head>
 <body>
 
