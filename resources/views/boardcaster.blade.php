@@ -13,7 +13,8 @@
     <div id="board"></div>
 </body>
 {{--  <script src='../'></script>  --}}
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+{{--  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>  --}}
+{{--  <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>  --}}
 <script>
     {{--  var peer = new Peer();
     console.log(peer);  --}}

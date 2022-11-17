@@ -4,7 +4,8 @@ import Pusher from 'pusher-js';
 import ReactDOM from 'react-dom';
 import axios from 'axios'
 import Echo from 'laravel-echo';
-// import Peer from 'simple-peer';
+import Peer from  'simple-peer/simplepeer.min.js';
+// simplepeer.min.js
 export default function Boardcaster() {
     const [videourl, setVideourl] = useState('')
     const [isvideo, setisVideo]  = useState(false)
@@ -65,6 +66,12 @@ export default function Boardcaster() {
         forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
         enabledTransports: ['ws', 'wss'],
         cluster:import.meta.env.VITE_PUSHER_APP_CLUSTER
+
+
+        // broadcaster: 'pusher',
+        // key: import.meta.env.VITE_PUSHER_APP_KEY,
+        // cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        // forceTLS: true
     });
 
    const handleclick =()=>{
@@ -148,7 +155,7 @@ export default function Boardcaster() {
     });
 
     streamingPresenceChannel.joining((user)=>{
-        console.log("New User", user);
+        // console.log("New User", user);
       let joiningUserIndex =  streamUsers.findIndex((data) => data.id === user.id)
 
       if(joiningUserIndex  < 0){
@@ -184,28 +191,30 @@ export default function Boardcaster() {
 
 
   function peerCreator (stream, user){
-
+        //  console.log(stream, user)
     let peer = new Peer({
         initiator: true,
         trickle: false,
         stream: stream,
-        config: {
-          iceServers: [
-            {
-              urls: "stun:stun.stunprotocol.org",
-            },
-            // {
-            //   urls: this.turn_url,
-            //   username: this.turn_username,
-            //   credential: this.turn_credential,
-            // },
-          ],
-        },
+        // config: {
+        //   iceServers: [
+        //     {
+        //       urls: "stun:stun.stunprotocol.org",
+        //     },
+        //     // {
+        //     //   urls: this.turn_url,
+        //     //   username: this.turn_username,
+        //     //   credential: this.turn_credential,
+        //     // },
+        //   ],
+        // },
       });
 
       peer.on("signal", (data) => {
         // send offer over here.
+        console.log(data, user)
         signalCallback(data, user);
+
       });
 
       peer.on("stream", (stream) => {
@@ -231,6 +240,7 @@ export default function Boardcaster() {
   }
 
  function signalCallback (offer, user) {
+    console.log(offer, user)
     axios.post("http://127.0.0.1:8000/stream-offer", {
         broadcaster:userid,
         receiver: user,
@@ -246,7 +256,7 @@ export default function Boardcaster() {
 
 
   function initializeSignalAnswerChannel (){
-    window.Echo.private(`stream-signal-channel.${userid}`).listen( "StreamAnswer",
+    window.Echo.private(`stream-signal-channel.${userid}`).listen("StreamAnswer",
     ({ data }) => {
         console.log("Signal Answer from private channel");
 
