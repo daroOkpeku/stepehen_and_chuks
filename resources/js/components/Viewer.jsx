@@ -55,13 +55,14 @@ export default function Viewer() {
 
 
     function initializeSignalOfferChannel(){
-        //  window.Echo.private
+        //  window.Echo.private stream-signal-channel
        window.Echo.private(`stream-signal-channel.${myid}`).listen('StreamOffer',
         ({data}) => {
-            console.log(data)
+
             // console.log("Signal Offer from private channel");
             setBroadcasterId(data.broadcaster);
             createViewerPeer(data.offer, data.broadcaster);
+
           }
         )
 
@@ -91,6 +92,7 @@ export default function Viewer() {
 
 
     function createViewerPeer(offer, broadcaster){
+        console.log(offer)
            let peer = new Peer({
             initiator: false,
             trickle: false,
@@ -159,7 +161,7 @@ export default function Viewer() {
 
           const updatedOffer = {
             ...offer,
-            sdp: `${offer.sdp}\n`,
+            sdp: `${offer.sdp}`,
           };
 
           peer.signal(updatedOffer);

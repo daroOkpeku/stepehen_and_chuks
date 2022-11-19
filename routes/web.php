@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Session;
 | contains the "web" middleware group. Now create something great!
 |
 */
+require_once __DIR__ . "/channels.php";
 
 Route::get('/', function () {
     return view('welcome');

@@ -256,8 +256,10 @@ export default function Boardcaster() {
 
 
   function initializeSignalAnswerChannel (){
+    // stream-signal-channel
     window.Echo.private(`stream-signal-channel.${userid}`).listen("StreamAnswer",
     ({ data }) => {
+        console.log(data)
         console.log("Signal Answer from private channel");
 
         if (data.answer.renegotiate) {
