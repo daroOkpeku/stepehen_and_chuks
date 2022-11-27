@@ -22,8 +22,13 @@ Broadcast::channel('streaming-channel.{streamId}', function ($user) {
 // stream-signal-channel.{userId}: stream-signal-channel is the name of the channel
 // and {userId} is a placeholder for the data been passed from the event private channel
 Broadcast::channel('stream-signal-channel.{userId}', function ($user, $userId) {
-    return intval($user->id) === intval($userId);
+    return (int) $user->id === (int) $userId;
 });
+
+// stream-signal-answer
+// Broadcast::channel('stream-signal-answer.{userId}', function ($user, $userId) {
+//     return (int) $user->id === (int) $userId;
+// });
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;

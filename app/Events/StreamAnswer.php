@@ -14,7 +14,6 @@ class StreamAnswer implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $data;
-
     /**
      * Create a new event instance.
      *
@@ -23,6 +22,7 @@ class StreamAnswer implements ShouldBroadcast
     public function __construct($data)
     {
         //this event the response that the viewer get from livestreamer
+        // dd($data);
         $this->data = $data;
     }
 

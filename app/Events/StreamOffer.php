@@ -13,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 class StreamOffer implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-   public $data;
+     public $data;
     /**
      * Create a new event instance.
      *

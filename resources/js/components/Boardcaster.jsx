@@ -7,9 +7,20 @@ import Echo from 'laravel-echo';
 import Peer from  'simple-peer/simplepeer.min.js';
 // simplepeer.min.js
 export default function Boardcaster() {
-    const [videourl, setVideourl] = useState('')
-    const [isvideo, setisVideo]  = useState(false)
-    const [playvideo, setPlayvideo] = useState(false)
+    // const [videourl, setVideourl] = useState('')
+    // const [isvideo, setisVideo]  = useState(false)
+    // const [playvideo, setPlayvideo] = useState(false)
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: import.meta.env.VITE_PUSHER_APP_KEY,
+        wsHost: import.meta.env.VITE_PUSHER_HOST ?? `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
+        wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
+        wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
+        forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
+        enabledTransports: ['ws', 'wss'],
+        cluster:import.meta.env.VITE_PUSHER_APP_CLUSTER
+    });
     const [peers, setPeers] = useState(undefined)
     const [otherUserId, SetotherUserId] = useState(null)
     const [streamdata, setStreamdata] = useState(null)
@@ -29,50 +40,9 @@ export default function Boardcaster() {
         }).catch((error)=>{
 
         });
-
-        // vidRef.current.play()
-// async function show(){
-//  let stream =  await  navigator.mediaDevices.getUserMedia({video:true, audio:true})
-//     console.log(stream)
-//      try{
-//         // setVideourl(stream)
-//         vidRef.current.srcObject = stream
-//     }catch(err){
-//         vidRef.current.src = URL.createObjectURL(stream)
-//     //    setVideourl(convert)
-
-//     }
-//     // setPlayvideo(true)
-//
-
-
-// let answer = await media.getpermissions()
-// console.log(URL.createObjectURL(answer));
-
-
-// }
-
-// show();
-
     },[])
 
-    window.Pusher = Pusher;
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: import.meta.env.VITE_PUSHER_APP_KEY,
-        wsHost: import.meta.env.VITE_PUSHER_HOST ?? `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-        wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
-        wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
-        forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
-        enabledTransports: ['ws', 'wss'],
-        cluster:import.meta.env.VITE_PUSHER_APP_CLUSTER
 
-
-        // broadcaster: 'pusher',
-        // key: import.meta.env.VITE_PUSHER_APP_KEY,
-        // cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-        // forceTLS: true
-    });
 
    const handleclick =()=>{
     let  media = new MediaHandler();
@@ -86,58 +56,6 @@ export default function Boardcaster() {
 
 }
     }).catch(err=>console.log(err))
-
-//     Pusher.logToConsole = true;
-
-
-//     let pusher = new Pusher('f959c4bf7c6b75daca59', {
-//        authEndpoint: 'authenticated',
-//        cluster: 'eu',
-//        auth: {
-//            params: userid,
-//            headers: {
-//                'X-CSRF-Token': token
-//            }
-//        }
-//    });
-
-//      var channel = pusher.subscribe('presence-auth');
-//      channel.bind('client-signal-'+userid, function(data) {
-//       console.log(data.userId)
-//       setPeers(data.userId);
-//         if(peers === undefined) {
-//             SetotherUserId(data.userId)
-//             startPeer(data.userId, false, channel)
-//         }
-
-//         // SetotherUserId
-//      });
-//    }
-
-//    function startPeer (userId, initiator = true, channel){
-//     const peerx = new Peer({
-//         initiator,
-//         stream:streamdata,
-//         trickle:false,
-//     })
-// // this
-//     peerx.on('signal', function(data){
-//         channel.trigger('client-signal-'+userId, {
-//             type: 'signal',
-//             userId: userid,
-//             data: data
-//         });
-//     })
-
-//     peerx.on('stream', (stream)=>{
-//         try{
-//             vidRef.current.srcObject = stream
-//         }catch(err){
-//             vidRef.current.src = URL.createObjectURL(stream)
-//             }
-//             vidRef.current.play()
-
-//     })
 
    }
 
@@ -155,7 +73,7 @@ export default function Boardcaster() {
     });
 
     streamingPresenceChannel.joining((user)=>{
-        // console.log("New User", user);
+        console.log("New User", user);
       let joiningUserIndex =  streamUsers.findIndex((data) => data.id === user.id)
 
       if(joiningUserIndex  < 0){
@@ -167,7 +85,7 @@ export default function Boardcaster() {
     })
 
     this.streamingPresenceChannel.leaving((user) => {
-        console.log(user.name, "Left");
+        // console.log(user.name, "Left");
         // destroy peer
         this.allPeers[user.id].getPeer().destroy();
 
@@ -190,6 +108,32 @@ export default function Boardcaster() {
    }
 
 
+   function initializeSignalAnswerChannel (){
+    // stream-signal-channel
+    window.Echo.private(`stream-signal-channel.${userid}`).listen('StreamAnswer',
+    ({ data }) => {
+        console.log(data)
+        console.log("Signal Answer from private channel");
+
+        if (data.answer.renegotiate) {
+          console.log("renegotating");
+        }
+        if (data.answer.sdp) {
+          const updatedSignal = {
+            ...data.answer,
+            sdp: `${data.answer.sdp}\n`,
+          };
+
+        //  allPeers[this.currentlyContactedUser]
+        //     .getPeer()
+        //     .signal(updatedSignal);
+        }
+      }
+
+    )
+  }
+
+
   function peerCreator (stream, user){
         //  console.log(stream, user)
     let peer = new Peer({
@@ -197,22 +141,24 @@ export default function Boardcaster() {
         trickle: false,
         stream: stream,
         // config: {
-        //   iceServers: [
-        //     {
-        //       urls: "stun:stun.stunprotocol.org",
-        //     },
-        //     // {
-        //     //   urls: this.turn_url,
-        //     //   username: this.turn_username,
-        //     //   credential: this.turn_credential,
-        //     // },
-        //   ],
-        // },
+        //     iceServers: [
+        //       {
+        //         urls:[ 'stun:stun.l.google.com:19302', 'stun:global.stun.twilio.com:3478']
+        //       },
+        //       // {
+        //       //   urls: this.turn_url,
+        //       //   username: this.turn_username,
+        //       //   credential: this.turn_credential,
+        //       // },
+        //     ],
+        //   },
+
+
       });
 
       peer.on("signal", (data) => {
         // send offer over here.
-        console.log(data, user)
+        // console.log(data, user)
         signalCallback(data, user);
 
       });
@@ -240,45 +186,22 @@ export default function Boardcaster() {
   }
 
  function signalCallback (offer, user) {
-    console.log(offer, user)
+    // console.log(offer, user)
     axios.post("http://127.0.0.1:8000/stream-offer", {
         broadcaster:userid,
         receiver: user,
         offer,
       })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   }
 
 
-  function initializeSignalAnswerChannel (){
-    // stream-signal-channel
-    window.Echo.private(`stream-signal-channel.${userid}`).listen("StreamAnswer",
-    ({ data }) => {
-        console.log(data)
-        console.log("Signal Answer from private channel");
 
-        if (data.answer.renegotiate) {
-          console.log("renegotating");
-        }
-        if (data.answer.sdp) {
-          const updatedSignal = {
-            ...data.answer,
-            sdp: `${data.answer.sdp}\n`,
-          };
-
-        //  allPeers[this.currentlyContactedUser]
-        //     .getPeer()
-        //     .signal(updatedSignal);
-        }
-      }
-
-    )
-  }
 
 
     return (

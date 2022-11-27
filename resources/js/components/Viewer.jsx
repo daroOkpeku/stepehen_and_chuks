@@ -7,6 +7,8 @@ import Peer from  'simple-peer/simplepeer.min.js';
 export default function Viewer() {
     // console.log(type, streamId, id)
     const [broadcasterId, setBroadcasterId] = useState(null)
+    const [datause, Setdatause] = useState(null)
+    const [broadcasteruse, Setbroadcasteruse] = useState(0)
     const vidRef = useRef();
     window.Pusher = Pusher;
     window.Echo = new Echo({
@@ -54,93 +56,70 @@ export default function Viewer() {
     }
 
 
-    function initializeSignalOfferChannel(){
-        //  window.Echo.private stream-signal-channel
-       window.Echo.private(`stream-signal-channel.${myid}`).listen('StreamOffer',
-        ({data}) => {
 
-            // console.log("Signal Offer from private channel");
-            setBroadcasterId(data.broadcaster);
-            createViewerPeer(data.offer, data.broadcaster);
-
-          }
-        )
-
-
-//             let pusher = new Pusher('f959c4bf7c6b75daca59', {
-//        authEndpoint: 'authenticated',
-//        cluster: 'eu',
-//        auth: {
-//            params: myid,
-//            headers: {
-//                'X-CSRF-Token': token
-//            }
-//        }
-//    });
-
-//    var channel = pusher.subscribe('stream-signal-channel.'+myid);
-//    channel.bind('App\\Events\\StreamOffer', function(data) {
-//     console.log(data)
-
-
-//       // SetotherUserId
-//    });
-
-
-    }
 
 
 
     function createViewerPeer(offer, broadcaster){
-        console.log(offer)
+        // console.log(offer)
            let peer = new Peer({
             initiator: false,
             trickle: false,
-            // config: {
-            //   iceServers: [
-            //     {
-            //       urls: "stun:stun.stunprotocol.org",
-            //     },
-            //     // {
-            //     //   urls: this.turn_url,
-            //     //   username: this.turn_username,
-            //     //   credential: this.turn_credential,
-            //     // },
-            //   ],
-            // },
+            config: {
+              iceServers: [
+                {
+                  urls:['stun:stun1.1.google.com:19302', 'stun:stun2.1.google.com:19302']
+                },
+                // {
+                //   urls: this.turn_url,
+                //   username: this.turn_username,
+                //   credential: this.turn_credential,
+                // },
+              ],
+            },
+
            });
            peer.addTransceiver("video", { direction: "recvonly" });
            peer.addTransceiver("audio", { direction: "recvonly" });
            handlePeerEvents(peer, offer, broadcaster)
     }
 
-    function handlePeerEvents(peer, offer, broadcaster){
 
+    function handlePeerEvents(peer, offer, broadcaster){
+        //   console.log(broadcaster)
         peer.on("signal", (data) => {
-            let formData = new FormData();
-            formData.append("broadcaster",  broadcaster)
-            formData.append("answer", data)
-            // formData.append('auth', id)
-            axios.post("http://127.0.0.1:8000/stream-answer", formData)
-              .then((res) => {
-                console.log(res);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
+                Setbroadcasteruse(broadcaster)
+                Setdatause(data)
+                // console.log(broadcaster, data)
+            // let formData = new FormData();
+            // formData.append("broadcaster",  broadcaster)
+            // formData.append("answer", data)
+            // // formData.append('auth', id)
+            // axios.post("http://127.0.0.1:8000/stream-answer", formData)
+            //   .then((res) => {
+            //     console.log(res);
+            //   })
+            //   .catch((err) => {
+            //     console.log(err);
+            //   });
+
           });
 
 
           peer.on("stream", (stream) => {
-            console.log(stream)
+            // console.log(stream)
             // display remote stream
-            try{
-                vidRef.current.srcObject = stream
-            }catch(err){
-                vidRef.current.src = URL.createObjectURL(stream)
-                  }
-                  vidRef.current.play()
+            vidRef.current.srcObject = stream
+            // vidRef.current.play();
           });
+
+               // vidRef.current.play();
+            // try{
+            //     vidRef.current.srcObject = stream
+            // }catch(err){
+            //     vidRef.current.src = URL.createObjectURL(stream)
+            //       }
+                //   vidRef.current.play()
 
 
           peer.on("track", (track, stream) => {
@@ -161,15 +140,51 @@ export default function Viewer() {
 
           const updatedOffer = {
             ...offer,
-            sdp: `${offer.sdp}`,
+            sdp: `${offer.sdp}\n`,
           };
 
           peer.signal(updatedOffer);
     }
 
+    useEffect(()=>{
+        console.log(broadcasteruse, datause)
+        // const interval =  setInterval(()=>{
+           if(broadcasteruse != '' && datause != null){
+            console.log(broadcasteruse, datause)
+            let formData = new FormData();
+            formData.append("broadcaster",  broadcasteruse)
+            formData.append("answer", datause)
+            // formData.append('auth', id)
+            axios.post("http://127.0.0.1:8000/stream-answer", formData)
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+
+           }
+        //    },1000)
+        //    return () => clearInterval(interval);
+    },[broadcasteruse, datause])
 
 
+    // console.log(datause, broadcasteruse)
 
+
+    function initializeSignalOfferChannel(){
+      //  window.Echo.private stream-signal-channel
+     window.Echo.private(`stream-signal-channel.${myid}`).listen('StreamOffer',
+      ({data}) => {
+
+          // console.log("Signal Offer from private channel");
+          setBroadcasterId(data.broadcaster);
+          createViewerPeer(data.offer, data.broadcaster);
+
+        }
+      )
+
+  }
 
 
     // function cleanupCallback (){
@@ -197,7 +212,7 @@ export default function Viewer() {
         <div>
 
             Viewer
-            <video ref={vidRef}  style={{width:'500px', height:'420px' }}  >
+            <video  style={{width:'500px', height:'420px' }} autoPlay={true} ref={vidRef} >
             </video>
            <button onClick={handleViewer}>join stream</button>
         </div>
