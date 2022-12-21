@@ -111,10 +111,11 @@ export default function Viewer() {
 
 
           peer.on("stream", (stream) => {
-            // console.log(stream)
-            // display remote stream
-            vidRef.current.srcObject = stream
-            // vidRef.current.play();
+            try{
+                vidRef.current.srcObject = stream
+            }catch(err){
+                vidRef.current.src = URL.createObjectURL(stream)
+                  }
           });
 
                // vidRef.current.play();
