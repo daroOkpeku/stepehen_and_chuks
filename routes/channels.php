@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 // Dynamic Presence Channel for Streaming
-Broadcast::channel('streaming-channel.{streamId}', function ($user) {
+Broadcast::channel("streaming-channel.{streamId}", function ($user) {
     return ['id' => $user->id, 'name' => $user->name];
 });
 
@@ -21,7 +21,7 @@ Broadcast::channel('streaming-channel.{streamId}', function ($user) {
 //the second premeter $userId is data pass from the event private channel
 // stream-signal-channel.{userId}: stream-signal-channel is the name of the channel
 // and {userId} is a placeholder for the data been passed from the event private channel
-Broadcast::channel('stream-signal-channel.{userId}', function ($user, $userId) {
+Broadcast::channel("stream-signal-channel.{userId}", function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 

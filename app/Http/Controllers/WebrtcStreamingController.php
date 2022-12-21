@@ -20,11 +20,14 @@ class WebrtcStreamingController extends Controller
 
     public function makeStreamAnswer(Request $request)
     {
-
-        $data['broadcaster'] = $request->broadcaster;
-        $data['answer'] = $request->answer;
+      
+        $data = [
+            'broadcaster'=> $request->broadcaster,
+            'answer' => $request->answer
+        ];
 
         event(new StreamAnswer($data));
+
     }
 
     public function index()

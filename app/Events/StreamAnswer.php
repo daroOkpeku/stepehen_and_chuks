@@ -22,8 +22,8 @@ class StreamAnswer implements ShouldBroadcast
     public function __construct($data)
     {
         //this event the response that the viewer get from livestreamer
-        // dd($data);
         $this->data = $data;
+        // dd(intval($this->data['broadcaster']) );
     }
 
     /**
@@ -33,6 +33,9 @@ class StreamAnswer implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('stream-signal-channel.'.$this->data['broadcaster']);
+        // broadcaster
+        // dd($this->data['broadcaster']);
+
+        return new PrivateChannel('stream-signal-channel.'.intval($this->data['broadcaster']));
     }
 }

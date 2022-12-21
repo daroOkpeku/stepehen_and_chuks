@@ -26,10 +26,12 @@ export default function Viewer() {
 
     const handleViewer =()=>{
         initializeStreamingChannel()
-        initializeSignalOfferChannel()
+     initializeSignalOfferChannel()
+     console.log('i am here...')
     }
 
     function initializeStreamingChannel(){
+        console.log({streamId})
        let streamingPresenceChannel = window.Echo.join(`streaming-channel.${streamId}`);
 
     //    let pusher = new Pusher('f959c4bf7c6b75daca59', {
@@ -61,7 +63,6 @@ export default function Viewer() {
 
 
     function createViewerPeer(offer, broadcaster){
-        // console.log(offer)
            let peer = new Peer({
             initiator: false,
             trickle: false,
@@ -79,6 +80,7 @@ export default function Viewer() {
             },
 
            });
+           console.log('i goot to peer')
            peer.addTransceiver("video", { direction: "recvonly" });
            peer.addTransceiver("audio", { direction: "recvonly" });
            handlePeerEvents(peer, offer, broadcaster)
@@ -88,20 +90,22 @@ export default function Viewer() {
     function handlePeerEvents(peer, offer, broadcaster){
         //   console.log(broadcaster)
         peer.on("signal", (data) => {
-                Setbroadcasteruse(broadcaster)
-                Setdatause(data)
+                   console.log('haha',data)
+                // Setbroadcasteruse(broadcaster)
+                // Setdatause(data)
                 // console.log(broadcaster, data)
-            // let formData = new FormData();
-            // formData.append("broadcaster",  broadcaster)
-            // formData.append("answer", data)
-            // // formData.append('auth', id)
-            // axios.post("http://127.0.0.1:8000/stream-answer", formData)
-            //   .then((res) => {
-            //     console.log(res);
-            //   })
-            //   .catch((err) => {
-            //     console.log(err);
-            //   });
+                let ans = JSON.stringify(data)
+            let formData = new FormData();
+            formData.append("broadcaster",  broadcaster)
+            formData.append("answer", ans)
+            // formData.append('auth', id)
+            axios.post("http://127.0.0.1:8000/stream-answer", formData)
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
 
           });
 
@@ -146,27 +150,27 @@ export default function Viewer() {
           peer.signal(updatedOffer);
     }
 
-    useEffect(()=>{
-        console.log(broadcasteruse, datause)
-        // const interval =  setInterval(()=>{
-           if(broadcasteruse != '' && datause != null){
-            console.log(broadcasteruse, datause)
-            let formData = new FormData();
-            formData.append("broadcaster",  broadcasteruse)
-            formData.append("answer", datause)
-            // formData.append('auth', id)
-            axios.post("http://127.0.0.1:8000/stream-answer", formData)
-              .then((res) => {
-                console.log(res);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
+    // useEffect(()=>{
+    //     // console.log(broadcasteruse, datause)
+    //     // const interval =  setInterval(()=>{
+    //        if(broadcasteruse != '' && datause != null){
+    //         // console.log(``+broadcasteruse, datause)
+    //         let formData = new FormData();
+    //         formData.append("broadcaster",  broadcasteruse)
+    //         formData.append("answer", datause)
+    //         // formData.append('auth', id)
+    //         axios.post("http://127.0.0.1:8000/stream-answer", formData)
+    //           .then((res) => {
+    //             console.log(res);
+    //           })
+    //           .catch((err) => {
+    //             console.log(err);
+    //           });
 
-           }
-        //    },1000)
-        //    return () => clearInterval(interval);
-    },[broadcasteruse, datause])
+    //        }
+    //     //    },1000)
+    //     //    return () => clearInterval(interval);
+    // },[broadcasteruse, datause])
 
 
     // console.log(datause, broadcasteruse)
@@ -174,8 +178,13 @@ export default function Viewer() {
 
     function initializeSignalOfferChannel(){
       //  window.Echo.private stream-signal-channel
+    //   console.log('this is the function that will be called')
+
+    console.log('haha')
      window.Echo.private(`stream-signal-channel.${myid}`).listen('StreamOffer',
       ({data}) => {
+
+        // console.log(`initializeSignalOfferChannel::${data}`)
 
           // console.log("Signal Offer from private channel");
           setBroadcasterId(data.broadcaster);

@@ -18,6 +18,7 @@
 <script>
     var type = {{ Js::from($type??"") }}
     var streamId = {{ Js::from($streamId??"")}}
+
     var id = {{ Js::from($id??"") }}
     var myid = {{ Js::from(auth()->user()->id??"") }}
     let token = document.querySelector('meta[name="csrf-token"]').content;

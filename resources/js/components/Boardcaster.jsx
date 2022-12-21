@@ -21,7 +21,7 @@ export default function Boardcaster() {
         enabledTransports: ['ws', 'wss'],
         cluster:import.meta.env.VITE_PUSHER_APP_CLUSTER
     });
-    const [peers, setPeers] = useState(undefined)
+    const [Peerz, setPeers] = useState(undefined)
     const [otherUserId, SetotherUserId] = useState(null)
     const [streamdata, setStreamdata] = useState(null)
     const [streamUsers, setStreamusers] = useState([])
@@ -51,7 +51,7 @@ export default function Boardcaster() {
            try{
     vidRef.current.srcObject = stream
     initializeStreamingChannel()
-    initializeSignalAnswerChannel()
+    // initializeSignalAnswerChannel()
 }catch(err){
 
 }
@@ -74,6 +74,7 @@ export default function Boardcaster() {
 
     streamingPresenceChannel.joining((user)=>{
         console.log("New User", user);
+    
       let joiningUserIndex =  streamUsers.findIndex((data) => data.id === user.id)
 
       if(joiningUserIndex  < 0){
@@ -107,36 +108,51 @@ export default function Boardcaster() {
 
    }
 
+//    console.log(`user id should be one::`+userid)
+//    function initializeSignalAnswerChannel (){
+//     // stream-signal-channel
+//     console.log(`stream-signal-channel.1`)
+//     window.Echo.private(`stream-signal-channel.${userid}`).listen('StreamAnswer',
+//     (data ) => {
+//         console.log('called')
+//         console.log(data)
+//       }
 
-   function initializeSignalAnswerChannel (){
-    // stream-signal-channel
-    window.Echo.private(`stream-signal-channel.${userid}`).listen('StreamAnswer',
-    ({ data }) => {
-        console.log(data)
-        console.log("Signal Answer from private channel");
-
-        if (data.answer.renegotiate) {
-          console.log("renegotating");
-        }
-        if (data.answer.sdp) {
-          const updatedSignal = {
-            ...data.answer,
-            sdp: `${data.answer.sdp}\n`,
-          };
-
-        //  allPeers[this.currentlyContactedUser]
-        //     .getPeer()
-        //     .signal(updatedSignal);
-        }
-      }
-
-    )
-  }
+//     )
+//   }
 
 
+
+//   function initializeSignalAnswerChannel (){
+//     // stream-signal-channel
+//     console.log(`stream-signal-channel.${userid}`)
+//     window.Echo.private(`stream-signal-channel.${userid}`).listen('StreamAnswer',
+//     ({ data }) => {
+//         console.log(data)
+//         console.log("Signal Answer from private channel");
+
+//         if (data.answer.renegotiate) {
+//           console.log("renegotating");
+//         }
+//         if (data.answer.sdp) {
+//           const updatedSignal = {
+//             ...data.answer,
+//             sdp: `${data.answer.sdp}\n`,
+//           };
+
+//         //  allPeers[this.currentlyContactedUser]
+//         //     .getPeer()
+//         //     .signal(updatedSignal);
+//         }
+//       }
+
+//     )
+//   }
+
+let peer;
   function peerCreator (stream, user){
         //  console.log(stream, user)
-    let peer = new Peer({
+     peer = new Peer({
         initiator: true,
         trickle: false,
         stream: stream,
@@ -183,6 +199,8 @@ export default function Boardcaster() {
         console.log("handle error gracefully");
       });
 
+      setPeers(peer)
+
   }
 
  function signalCallback (offer, user) {
@@ -201,6 +219,28 @@ export default function Boardcaster() {
   }
 
 
+  useEffect(()=>{
+   
+    window.Echo.private(`stream-signal-channel.${userid}`).listen('StreamAnswer',
+    ({ data }) => {
+        let ans = JSON.parse(data.answer)
+        if (ans.renegotiate) {
+          console.log("renegotating");
+        }
+        if (ans.sdp) {
+          const updatedSignal = {
+            ...ans,
+            sdp: `${ans.sdp}\n`,
+          };
+        // streamUsers
+        streamUsers[otherUserId]
+        peer.signal(updatedSignal);
+        }
+      }
+
+    )
+  },[])
+
 
 
 
@@ -213,6 +253,7 @@ export default function Boardcaster() {
         </div>
     )
 }
+
 if (document.getElementById('board')) {
     ReactDOM.render(<Boardcaster/>, document.getElementById('board'));
 }
